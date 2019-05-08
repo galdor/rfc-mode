@@ -64,8 +64,7 @@
   :group 'rfc-mode)
 
 (defcustom rfc-mode-browser-entry-title-width 60
-  "The width of the column containing the title of each entry in
-the RFC browser."
+  "The width of the column containing RFC titles in the browser."
   :type 'integer
   :group 'rfc-mode)
 
@@ -112,12 +111,11 @@ the RFC browser."
   (recenter 0))
 
 (defun rfc-mode-read (number)
-  "Read a RFC document."
+  "Read the RFC document NUMBER."
   (interactive "nRFC number: ")
   (switch-to-buffer (rfc-mode-document-buffer number)))
 
 (defun rfc-mode-reload-index ()
-
   "Reload the RFC document index from its original file."
   (interactive)
   (setq rfc-mode-index-entries
@@ -181,9 +179,11 @@ the RFC browser."
             (goto-char end)))))))
 
 (defun rfc-mode-header-start ()
-  "When the point is on a linebreak, move it to the start of the
-  current page header and return the position of the end of the
-  header."
+  "Move to the start of the current header.
+
+When the point is on a linebreak character, move it to the start
+of the current page header and return the position of the end of
+the header."
   (when (looking-at "")
     (forward-line 1)
     (move-end-of-line 1)
@@ -193,29 +193,37 @@ the RFC browser."
       end)))
 
 (defun rfc-mode-previous-header ()
-  "Move to the start of the previous page header and return the
-position of its end. Return NIL if no previous header is found."
+  "Move the the start of the previous header.
+
+Return the position of the end of the previous header or NIL if
+no previous header is found."
   (when (search-backward "" nil t)
     (goto-char (match-beginning 0))
     (rfc-mode-header-start)))
 
 (defun rfc-mode-next-header ()
-  "Move to the start of the next page header and return the
-position of its end. Return NIL if no next header is found."
+  "Move the the end of the previous header.
+
+Return the position of the end of the next header or NIL if
+no next header is found."
   (when (search-forward "" nil t)
     (goto-char (match-beginning 0))
     (rfc-mode-header-start)))
 
 ;;; Browser utils
 (defun rfc-mode-browser-helm-sources (entries)
-  "Create a Helm source for a list of RFC index entries in the browser."
+  "Create a Helm source for ENTRIES.
+
+ENTRIES is a list of RFC index entries in the browser."
   (helm-build-sync-source "RFC documents"
     :candidates (mapcar #'rfc-mode-browser-helm-candidate entries)
     :action (helm-make-actions
              "Read" #'rfc-mode-browser-helm-entry-read)))
 
 (defun rfc-mode-browser-helm-candidate (entry)
-  "Create a Helm candidate for a RFC index entry in the browser."
+  "Create a Helm candidate for ENTRY.
+
+ENTRY is a RFC index entry in the browser."
   (let* ((ref (rfc-mode-pad-string
                (format "RFC%d" (plist-get entry :number)) 7))
          (title (rfc-mode-pad-string
@@ -236,7 +244,7 @@ position of its end. Return NIL if no next header is found."
     (cons string entry)))
 
 (defun rfc-mode-browser-helm-entry-read (entry)
-  "The read action for Helm candidates in the browser."
+  "The read action the Helm candidate ENTRY in the browser."
   (let ((number (plist-get entry :number)))
     (rfc-mode-read number)))
 
@@ -264,14 +272,14 @@ position of its end. Return NIL if no next header is found."
       (nreverse entries))))
 
 (defun rfc-mode-parse-index-entry (string)
-  "Parse an entry in the RFC document index and return it as a plist."
+  "Parse the RFC document index entry STRING and return it as a plist."
   (unless (string-match "\\(^[0-9]+\\) *\\(.*?\\)\\.\\(?: \\|$\\)" string)
-    (error "invalid index entry format: %S" string))
+    (error "Invalid index entry format: %S" string))
   (let* ((number-string (match-string 1 string))
          (number (string-to-number number-string))
          (title (match-string 2 string)))
     (unless number
-      (error "invalid index entry number: ~S" number-string))
+      (error "Invalid index entry number: ~S" number-string))
     (let ((entry (list :number number :title title)))
       (when (string-match "(Status: \\([^)]+\\))" string)
         (plist-put entry :status (downcase (match-string 1 string))))
@@ -291,15 +299,17 @@ position of its end. Return NIL if no next header is found."
 
 ;;; Document utils
 (defun rfc-mode-document-buffer-name (number)
-  "Return the buffer name for a RFC document."
+  "Return the buffer name for the RFC document NUMBER."
   (concat "*rfc" (number-to-string number) "*"))
 
 (defun rfc-mode-document-path (number)
-  "Return the absolute path of a RFC document."
+  "Return the absolute path of the RFC document NUMBER."
   (concat rfc-mode-directory "rfc" (number-to-string number) ".txt"))
 
 (defun rfc-mode-document-buffer (number)
-  "Return a buffer visiting a RFC document, creating it if necessary."
+  "Return a buffer visiting the RFC document NUMBER.
+
+The buffer is created if it does not exist."
   (let* ((buffer-name (rfc-mode-document-buffer-name number))
          (document-path (rfc-mode-document-path number)))
     (find-file document-path)
@@ -310,20 +320,25 @@ position of its end. Return NIL if no next header is found."
 ;;; Misc utils
 
 (defun rfc-mode-parse-rfc-ref (string)
-  "Parse a reference to a RFC document, e.g. \"RFC 2822\"."
+  "Parse a reference to a RFC document from STRING.
+
+For example: \"RFC 2822\"."
   (when (string-match "^RFC *\\([0-9]+\\)" string)
     (string-to-number (match-string 1 string))))
 
 (defun rfc-mode-parse-rfc-refs (string)
-  "Parse a list of references to a RFC document, e.g. \"RFC3401,
-  RFC3402 ,RFC 3403\"."
+  "Parse a list of references to RFC documents from STRING.
+
+For example: \"RFC3401, RFC3402 ,RFC 3403\"."
   (seq-remove #'null (mapcar #'rfc-mode-parse-rfc-ref
                              (split-string string "," t " +"))))
 
 (defun rfc-mode-pad-string (string width)
+  "Pad STRING with spaces to WIDTH characters."
   (truncate-string-to-width string width 0 ?\s))
 
 (defun rfc-mode-highlight-string (string face)
+  "Highlight STRING using FACE."
   (put-text-property 0 (length string) 'face face string)
   string)
 
