@@ -116,7 +116,7 @@
 (defun rfc-mode-read (number)
   "Read the RFC document NUMBER."
   (interactive "nRFC number: ")
-  (switch-to-buffer (rfc-mode-document-buffer number)))
+  (switch-to-buffer (rfc-mode--document-buffer number)))
 
 (defun rfc-mode-reload-index ()
   "Reload the RFC document index from its original file."
@@ -227,22 +227,22 @@ ENTRIES is a list of RFC index entries in the browser."
   "Create a Helm candidate for ENTRY.
 
 ENTRY is a RFC index entry in the browser."
-  (let* ((ref (rfc-mode-pad-string
+  (let* ((ref (rfc-mode--pad-string
                (format "RFC%d" (plist-get entry :number)) 7))
-         (title (rfc-mode-pad-string
+         (title (rfc-mode--pad-string
                  (plist-get entry :title)
                  rfc-mode-browser-entry-title-width))
          (status (or (plist-get entry :status) ""))
          (obsoleted-by (plist-get entry :obsoleted-by))
          (obsoletep (> (length obsoleted-by) 0))
          (string (format "%s  %s  %s"
-                         (rfc-mode-highlight-string
+                         (rfc-mode--highlight-string
                           ref 'rfc-mode-browser-ref-face)
-                         (rfc-mode-highlight-string
+                         (rfc-mode--highlight-string
                           title (if obsoletep
                                     'rfc-mode-browser-title-obsolete-face
                                   'rfc-mode-browser-title-face))
-                         (rfc-mode-highlight-string
+                         (rfc-mode--highlight-string
                           status 'rfc-mode-browser-status-face))))
     (cons string entry)))
 
@@ -288,33 +288,33 @@ ENTRY is a RFC index entry in the browser."
         (plist-put entry :status (downcase (match-string 1 string))))
       (when (string-match "(Obsoletes \\([^)]+\\))" string)
         (plist-put entry :obsoletes
-                   (rfc-mode-parse-rfc-refs (match-string 1 string))))
+                   (rfc-mode--parse-rfc-refs (match-string 1 string))))
       (when (string-match "(Obsoleted by \\([^)]+\\))" string)
         (plist-put entry :obsoleted-by
-                   (rfc-mode-parse-rfc-refs (match-string 1 string))))
+                   (rfc-mode--parse-rfc-refs (match-string 1 string))))
       (when (string-match "(Updates \\([^)]+\\))" string)
         (plist-put entry :updates
-                   (rfc-mode-parse-rfc-refs (match-string 1 string))))
+                   (rfc-mode--parse-rfc-refs (match-string 1 string))))
       (when (string-match "(Updated by \\([^)]+\\))" string)
         (plist-put entry :updated-by
-                   (rfc-mode-parse-rfc-refs (match-string 1 string))))
+                   (rfc-mode--parse-rfc-refs (match-string 1 string))))
       entry)))
 
 ;;; Document utils
-(defun rfc-mode-document-buffer-name (number)
+(defun rfc-mode--document-buffer-name (number)
   "Return the buffer name for the RFC document NUMBER."
   (concat "*rfc" (number-to-string number) "*"))
 
-(defun rfc-mode-document-path (number)
+(defun rfc-mode--document-path (number)
   "Return the absolute path of the RFC document NUMBER."
   (concat rfc-mode-directory "rfc" (number-to-string number) ".txt"))
 
-(defun rfc-mode-document-buffer (number)
+(defun rfc-mode--document-buffer (number)
   "Return a buffer visiting the RFC document NUMBER.
 
 The buffer is created if it does not exist."
-  (let* ((buffer-name (rfc-mode-document-buffer-name number))
-         (document-path (rfc-mode-document-path number)))
+  (let* ((buffer-name (rfc-mode--document-buffer-name number))
+         (document-path (rfc-mode--document-path number)))
     (find-file document-path)
     (rename-buffer buffer-name)
     (rfc-mode)
@@ -322,25 +322,25 @@ The buffer is created if it does not exist."
 
 ;;; Misc utils
 
-(defun rfc-mode-parse-rfc-ref (string)
+(defun rfc-mode--parse-rfc-ref (string)
   "Parse a reference to a RFC document from STRING.
 
 For example: \"RFC 2822\"."
   (when (string-match "^RFC *\\([0-9]+\\)" string)
     (string-to-number (match-string 1 string))))
 
-(defun rfc-mode-parse-rfc-refs (string)
+(defun rfc-mode--parse-rfc-refs (string)
   "Parse a list of references to RFC documents from STRING.
 
 For example: \"RFC3401, RFC3402 ,RFC 3403\"."
-  (seq-remove #'null (mapcar #'rfc-mode-parse-rfc-ref
+  (seq-remove #'null (mapcar #'rfc-mode--parse-rfc-ref
                              (split-string string "," t " +"))))
 
-(defun rfc-mode-pad-string (string width)
+(defun rfc-mode--pad-string (string width)
   "Pad STRING with spaces to WIDTH characters."
   (truncate-string-to-width string width 0 ?\s))
 
-(defun rfc-mode-highlight-string (string face)
+(defun rfc-mode--highlight-string (string face)
   "Highlight STRING using FACE."
   (put-text-property 0 (length string) 'face face string)
   string)
