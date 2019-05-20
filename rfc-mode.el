@@ -282,7 +282,7 @@ ENTRY is a RFC index entry in the browser."
          (number (string-to-number number-string))
          (title (match-string 2 string)))
     (unless number
-      (error "Invalid index entry number: ~S" number-string))
+      (error "Invalid index entry number: %S" number-string))
     (let ((entry (list :number number :title title)))
       (when (string-match "(Status: \\([^)]+\\))" string)
         (plist-put entry :status (downcase (match-string 1 string))))
