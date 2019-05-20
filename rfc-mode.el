@@ -202,7 +202,7 @@ no previous header is found."
     (rfc-mode-header-start)))
 
 (defun rfc-mode-next-header ()
-  "Move the the end of the previous header.
+  "Move the end of the previous header.
 
 Return the position of the end of the next header or NIL if
 no next header is found."
