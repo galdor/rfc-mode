@@ -25,6 +25,9 @@
 
 ;;; Code:
 
+(require 'helm)
+(require 'seq)
+
 ;;; Configuration
 (defgroup rfc-mode-group nil
   "Tools to browse and read RFC documents."
