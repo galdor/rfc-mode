@@ -32,6 +32,7 @@
 (defgroup rfc-mode-group nil
   "Tools to browse and read RFC documents."
   :prefix "rfc-mode-"
+  :link '(url-link :tag "GitHub" "https://github.com/galdor/rfc-mode")
   :group 'external)
 
 (defface rfc-mode-document-header-face
