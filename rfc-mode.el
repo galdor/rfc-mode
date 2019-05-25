@@ -32,6 +32,7 @@
 (defgroup rfc-mode-group nil
   "Tools to browse and read RFC documents."
   :prefix "rfc-mode-"
+  :link '(url-link :tag "GitHub" "https://github.com/galdor/rfc-mode")
   :group 'external)
 
 (defface rfc-mode-document-header-face
@@ -64,6 +65,13 @@
 (defcustom rfc-mode-directory (expand-file-name "~/rfc/")
   "The directory where RFC documents are stored."
   :type 'directory
+  :group 'rfc-mode)
+
+(defcustom rfc-mode-document-url
+  "https://www.rfc-editor.org/rfc/rfc%s.txt"
+  "A `format'able URL for fetching arbitrary RFC documents.
+Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
+  :type 'string
   :group 'rfc-mode)
 
 (defcustom rfc-mode-browser-entry-title-width 60
@@ -127,6 +135,7 @@
 (defun rfc-mode-browse ()
   "Browse through all RFC documents referenced in the index using Helm."
   (interactive)
+  (rfc-mode--fetch-document "-index" rfc-mode-index-path)
   (unless rfc-mode-index-entries
     (setq rfc-mode-index-entries
           (rfc-mode-read-index-file rfc-mode-index-path)))
@@ -315,12 +324,26 @@ ENTRY is a RFC index entry in the browser."
 The buffer is created if it does not exist."
   (let* ((buffer-name (rfc-mode--document-buffer-name number))
          (document-path (rfc-mode--document-path number)))
+    (rfc-mode--fetch-document number document-path)
     (find-file document-path)
     (rename-buffer buffer-name)
     (rfc-mode)
     (current-buffer)))
 
 ;;; Misc utils
+
+(defun rfc-mode--fetch-document (suffix document-path)
+  "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
+If no such file exists, fetch it from `rfc-document-url'."
+  (rfc-mode--check-directory)
+  (unless (file-exists-p document-path)
+    (url-copy-file (format rfc-mode-document-url suffix) document-path)))
+
+(defun rfc-mode--check-directory ()
+  "Check that `rfc-mode-directory' exists -- create if not."
+  (when (and (not (file-exists-p rfc-mode-directory))
+             (y-or-n-p (format "Create directory %s? " rfc-mode-directory)))
+    (make-directory rfc-mode-directory t)))
 
 (defun rfc-mode--parse-rfc-ref (string)
   "Parse a reference to a RFC document from STRING.
