@@ -1,4 +1,7 @@
 
+[![MELPA Stable](https://stable.melpa.org/packages/rfc-mode-badge.svg)](https://stable.melpa.org/#/rfc-mode)
+[![MELPA](https://melpa.org/packages/rfc-mode-badge.svg)](https://melpa.org/#/rfc-mode)
+
 # rfc-mode
 
 ## Introduction
