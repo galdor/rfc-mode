@@ -122,6 +122,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (rfc-mode-previous-header)
   (recenter 0))
 
+;;;###autoload
 (defun rfc-mode-read (number)
   "Read the RFC document NUMBER."
   (interactive "nRFC number: ")
@@ -133,6 +134,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (setq rfc-mode-index-entries
         (rfc-mode-read-index-file (rfc-mode-index-path))))
 
+;;;###autoload
 (defun rfc-mode-browse ()
   "Browse through all RFC documents referenced in the index using Helm."
   (interactive)
