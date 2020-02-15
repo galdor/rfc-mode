@@ -28,7 +28,8 @@
 (require 'helm)
 (require 'seq)
 
-;;; Configuration
+;;; Configuration:
+
 (defgroup rfc-mode-group nil
   "Tools to browse and read RFC documents."
   :prefix "rfc-mode-"
@@ -79,14 +80,16 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'integer
   :group 'rfc-mode)
 
-;;; Misc variables
+;;; Misc variables:
+
 (defvar rfc-mode-index-path (concat rfc-mode-directory "rfc-index.txt")
   "The path of the file containing the index of all RFC documents.")
 
 (defvar rfc-mode-index-entries nil
   "The list of entries in the RFC index.")
 
-;;; Keys
+;;; Keys:
+
 (defvar rfc-mode-map
   (let ((map (make-keymap)))
     (define-key map (kbd "q") 'rfc-mode-quit)
@@ -95,7 +98,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
     map)
   "The keymap for `rfc-mode'.")
 
-;;; Main
+;;; Main:
+
 (defun rfc-mode-init ()
   "Initialize the current buffer for `rfc-mode'."
   (setq-local buffer-read-only t)
@@ -152,7 +156,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("rfc[0-9]+\\.txt\\'" . rfc-mode))
 
-;;; Syntax utils
+;;; Syntax utils:
+
 (defun rfc-mode-highlight ()
   "Highlight the current buffer."
   (with-silent-modifications
@@ -222,7 +227,8 @@ no next header is found."
     (goto-char (match-beginning 0))
     (rfc-mode-header-start)))
 
-;;; Browser utils
+;;; Browser utils:
+
 (defun rfc-mode-browser-helm-sources (entries)
   "Create a Helm source for ENTRIES.
 
@@ -260,7 +266,7 @@ ENTRY is a RFC index entry in the browser."
   (let ((number (plist-get entry :number)))
     (rfc-mode-read number)))
 
-;;; Index utils
+;;; Index utils:
 (defun rfc-mode-read-index-file (path)
   "Read an RFC index file at PATH and return a list of entries."
   (with-temp-buffer
@@ -309,7 +315,8 @@ ENTRY is a RFC index entry in the browser."
                    (rfc-mode--parse-rfc-refs (match-string 1 string))))
       entry)))
 
-;;; Document utils
+;;; Document utils:
+
 (defun rfc-mode--document-buffer-name (number)
   "Return the buffer name for the RFC document NUMBER."
   (concat "*rfc" (number-to-string number) "*"))
@@ -330,7 +337,7 @@ The buffer is created if it does not exist."
     (rfc-mode)
     (current-buffer)))
 
-;;; Misc utils
+;;; Misc utils:
 
 (defun rfc-mode--fetch-document (suffix document-path)
   "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
