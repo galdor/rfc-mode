@@ -73,6 +73,10 @@
 Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'string)
 
+(defcustom rfc-mode-use-original-buffer-names nil
+  "Whether RFC document buffers should keep their original name or not."
+  :type 'boolean)
+
 (defcustom rfc-mode-browser-entry-title-width 60
   "The width of the column containing RFC titles in the browser."
   :type 'integer)
@@ -329,7 +333,8 @@ The buffer is created if it does not exist."
          (document-path (rfc-mode--document-path number)))
     (rfc-mode--fetch-document number document-path)
     (find-file document-path)
-    (rename-buffer buffer-name)
+    (unless rfc-mode-use-original-buffer-names
+      (rename-buffer buffer-name))
     (rfc-mode)
     (current-buffer)))
 
