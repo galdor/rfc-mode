@@ -150,7 +150,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (rfc-mode-init))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("rfc[0-9]+\\.txt\\'" . rfc-mode))
+(add-to-list 'auto-mode-alist '("/rfc[0-9]+\\.txt\\'" . rfc-mode))
 
 ;;; Syntax utils:
 
