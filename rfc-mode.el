@@ -323,7 +323,7 @@ ENTRY is a RFC index entry in the browser."
 
 (defun rfc-mode--document-path (number)
   "Return the absolute path of the RFC document NUMBER."
-  (concat rfc-mode-directory "rfc" (number-to-string number) ".txt"))
+  (expand-file-name (format "rfc%s.txt" number) rfc-mode-directory))
 
 (defun rfc-mode--document-buffer (number)
   "Return a buffer visiting the RFC document NUMBER.
