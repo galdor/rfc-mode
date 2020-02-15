@@ -340,12 +340,12 @@ The buffer is created if it does not exist."
 (defun rfc-mode--fetch-document (suffix document-path)
   "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
 If no such file exists, fetch it from `rfc-document-url'."
-  (rfc-mode--check-directory)
+  (rfc-mode--ensure-directory-exists)
   (unless (file-exists-p document-path)
     (url-copy-file (format rfc-mode-document-url suffix) document-path)))
 
-(defun rfc-mode--check-directory ()
-  "Check that `rfc-mode-directory' exists -- create if not."
+(defun rfc-mode--ensure-directory-exists ()
+  "Check that `rfc-mode-directory' exists, creating it if it does not."
   (when (and (not (file-exists-p rfc-mode-directory))
              (y-or-n-p (format "Create directory %s? " rfc-mode-directory)))
     (make-directory rfc-mode-directory t)))
