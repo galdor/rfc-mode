@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(require 'helm)
+(require 'helm nil t)
 (require 'seq)
 
 ;;; Configuration:
