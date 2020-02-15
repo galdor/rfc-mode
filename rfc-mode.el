@@ -176,7 +176,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
       ;; Section titles
       (save-excursion
         (goto-char (point-min))
-        (while (search-forward-regexp "^\\([0-9]+\\.\\)+ .*$" nil t)
+        (while (search-forward-regexp "^\\(?:[0-9]+\\.\\)+\\(?:[0-9]+\\)? .*$" nil t)
           (let ((start (match-beginning 0))
                 (end (match-end 0)))
             (put-text-property start end
