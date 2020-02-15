@@ -65,20 +65,17 @@
 
 (defcustom rfc-mode-directory (expand-file-name "~/rfc/")
   "The directory where RFC documents are stored."
-  :type 'directory
-  :group 'rfc-mode)
+  :type 'directory)
 
 (defcustom rfc-mode-document-url
   "https://www.rfc-editor.org/rfc/rfc%s.txt"
   "A `format'able URL for fetching arbitrary RFC documents.
 Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
-  :type 'string
-  :group 'rfc-mode)
+  :type 'string)
 
 (defcustom rfc-mode-browser-entry-title-width 60
   "The width of the column containing RFC titles in the browser."
-  :type 'integer
-  :group 'rfc-mode)
+  :type 'integer)
 
 ;;; Misc variables:
 
