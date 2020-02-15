@@ -1,0 +1,44 @@
+#+TITLE: rfc-mode changelog
+
+* 1.2.0
+This new release is driven by suggestions from Stefan Monnier and some issues
+which were open on Github. Thanks everyone!
+
+** Features
+- Let the module load without Helm since some features can be used without it.
+- Auto load ~rfc-mode-read~.
+- Improved accuracy for section title detection.
+- Offer the possibility to keep original buffer names with
+  ~rfc-mode-use-original-buffer-names~.
+
+** Fixes
+- Compute the index path dynamically so that ~rfc-mode-directory~ can be
+  modified after the module has been loaded.
+
+** Misc
+- Follow Emacs conventions in docstrings.
+- Derive ~rfc-mode~ from ~text-mode~.
+- Use ~expand-file-name~ instead of ~concat~.
+
+* 1.1.1
+** Features
+- Automatically download missing files.
+
+* 1.1.0
+** Fixes
+- Require missing modules.
+- Fix invalid escape sequence.
+
+** Misc
+- Make some functions private.
+
+* 1.0.1
+*** Fixes
+- Various fixes for checkdoc.
+
+* 1.0.0
+First public version.
+
+** Features
+- Helm-based RFC browser.
+- RFC document reader with highlighting.
