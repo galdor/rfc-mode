@@ -145,10 +145,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
         :sources (rfc-mode-browser-helm-sources rfc-mode-index-entries)))
 
 ;;;###autoload
-(define-derived-mode rfc-mode fundamental-mode "rfc-mode"
+(define-derived-mode rfc-mode text-mode "rfc-mode"
   "Major mode to browse and read RFC documents."
-  :syntax-table text-mode-syntax-table
-  :mode-map rfc-mode-map
   (rfc-mode-init))
 
 ;;;###autoload
