@@ -83,9 +83,6 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 
 ;;; Misc variables:
 
-(defvar rfc-mode-index-path (concat rfc-mode-directory "rfc-index.txt")
-  "The path of the file containing the index of all RFC documents.")
-
 (defvar rfc-mode-index-entries nil
   "The list of entries in the RFC index.")
 
@@ -136,15 +133,15 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   "Reload the RFC document index from its original file."
   (interactive)
   (setq rfc-mode-index-entries
-        (rfc-mode-read-index-file rfc-mode-index-path)))
+        (rfc-mode-read-index-file (rfc-mode-index-path))))
 
 (defun rfc-mode-browse ()
   "Browse through all RFC documents referenced in the index using Helm."
   (interactive)
-  (rfc-mode--fetch-document "-index" rfc-mode-index-path)
+  (rfc-mode--fetch-document "-index" (rfc-mode-index-path))
   (unless rfc-mode-index-entries
     (setq rfc-mode-index-entries
-          (rfc-mode-read-index-file rfc-mode-index-path)))
+          (rfc-mode-read-index-file (rfc-mode-index-path))))
   (helm :buffer "*helm rfc browser*"
         :sources (rfc-mode-browser-helm-sources rfc-mode-index-entries)))
 
@@ -267,6 +264,11 @@ ENTRY is a RFC index entry in the browser."
     (rfc-mode-read number)))
 
 ;;; Index utils:
+
+(defun rfc-mode-index-path ()
+  "Return he path of the file containing the index of all RFC documents."
+  (concat rfc-mode-directory "rfc-index.txt"))
+
 (defun rfc-mode-read-index-file (path)
   "Read an RFC index file at PATH and return a list of entries."
   (with-temp-buffer
