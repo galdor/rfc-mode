@@ -122,6 +122,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (rfc-mode-previous-header)
   (recenter 0))
 
+;;;###autoload
 (defun rfc-mode-read (number)
   "Read the RFC document NUMBER."
   (interactive "nRFC number: ")
