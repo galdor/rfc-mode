@@ -25,8 +25,10 @@ Then set the location containing all RFC documents (the default value is the
 (setq rfc-mode-directory (expand-file-name "~/rfc/"))
 ```
 
-The entire RFC collection can be download from
-https://www.rfc-editor.org/retrieve/bulk.
+RFC documents and their index will be directly downloaded from
+https://www.rfc-editor.org when required. Alternatively, the entire RFC
+collection can be downloadeded from https://www.rfc-editor.org/retrieve/bulk
+to ensure full access without the need for an internet connection.
 
 Call `rfc-mode-browse` to choose a RFC document to read, or `rfc-mode-read` to
 enter the reference of the RFC document yourself.
