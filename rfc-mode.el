@@ -102,6 +102,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
     (define-key map (kbd "q") 'rfc-mode-quit)
     (define-key map (kbd "<prior>") 'rfc-mode-backward-page)
     (define-key map (kbd "<next>") 'rfc-mode-forward-page)
+    (define-key map (kbd "n") 'rfc-mode-next-section)
+    (define-key map (kbd "p") 'rfc-mode-previous-section)
     map)
   "The keymap for `rfc-mode'.")
 
@@ -132,6 +134,31 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (forward-page)
   (rfc-mode-previous-header)
   (recenter 0))
+
+(defun rfc-mode-next-section (n)
+  "Move point to Nth next section (default 1)."
+  (interactive "p")
+  (let ((case-fold-search nil)
+        (start (point)))
+    (if (looking-at rfc-mode-title-regexp)
+	(forward-line 1))
+    (if (re-search-forward rfc-mode-title-regexp (point-max) t n)
+	(beginning-of-line)
+      (goto-char (point-max))
+      ;; The last line doesn't belong to any section.
+      (forward-line -1))
+    ;; Ensure we never move back from the starting point.
+    (if (< (point) start) (goto-char start))))
+
+(defun rfc-mode-previous-section (n)
+  "Move point to Nth previous section (default 1)."
+  (interactive "p")
+  (let ((case-fold-search nil))
+    (if (looking-at rfc-mode-title-regexp)
+	(forward-line -1))
+    (if (re-search-backward rfc-mode-title-regexp (point-min) t n)
+	(beginning-of-line)
+      (goto-char (point-min)))))
 
 ;;;###autoload
 (defun rfc-mode-read (number)
