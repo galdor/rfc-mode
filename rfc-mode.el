@@ -81,10 +81,18 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   "The width of the column containing RFC titles in the browser."
   :type 'integer)
 
+(defcustom rfc-mode-imenu-title "RFC Contents"
+  "The title to use if `rfc-mode' adds a RFC Contents menu to the menubar."
+  :type 'string
+  :group 'rfc-mode-group)
+
 ;;; Misc variables:
 
 (defvar rfc-mode-index-entries nil
   "The list of entries in the RFC index.")
+
+(defconst rfc-mode-title-regexp "^\\(?:[0-9]+\\.\\)+\\(?:[0-9]+\\)? .*$"
+  "Regular expression to model section titles in RFC documents.")
 
 ;;; Keys:
 
@@ -102,7 +110,9 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 (defun rfc-mode-init ()
   "Initialize the current buffer for `rfc-mode'."
   (setq-local page-delimiter "^.*?\n")
-  (rfc-mode-highlight))
+  (rfc-mode-highlight)
+  (setq imenu-generic-expression (list (list nil rfc-mode-title-regexp 0)))
+  (imenu-add-to-menubar rfc-mode-imenu-title))
 
 (defun rfc-mode-quit ()
   "Quit the current window and bury its buffer."
@@ -173,7 +183,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
       ;; Section titles
       (save-excursion
         (goto-char (point-min))
-        (while (search-forward-regexp "^\\(?:[0-9]+\\.\\)+\\(?:[0-9]+\\)? .*$" nil t)
+        (while (search-forward-regexp rfc-mode-title-regexp nil t)
           (let ((start (match-beginning 0))
                 (end (match-end 0)))
             (put-text-property start end
