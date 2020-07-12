@@ -100,7 +100,6 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 
 (defun rfc-mode-init ()
   "Initialize the current buffer for `rfc-mode'."
-  (setq-local buffer-read-only t)
   (setq-local page-delimiter "^.*?\n")
   (rfc-mode-highlight))
 
@@ -146,7 +145,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
         :sources (rfc-mode-browser-helm-sources rfc-mode-index-entries)))
 
 ;;;###autoload
-(define-derived-mode rfc-mode text-mode "rfc-mode"
+(define-derived-mode rfc-mode special-mode "rfc-mode"
   "Major mode to browse and read RFC documents."
   (rfc-mode-init))
 
