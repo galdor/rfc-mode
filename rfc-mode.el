@@ -74,7 +74,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'string)
 
 (defcustom rfc-mode-use-original-buffer-names nil
-  "Whether RFC document buffers should keep their original name or not."
+  "Whether RFC document buffers should have the name of the document file (e.g. rfc21.txt vs *rfc21*)."
   :type 'boolean)
 
 (defcustom rfc-mode-browser-entry-title-width 60
