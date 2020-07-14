@@ -94,6 +94,13 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 (defconst rfc-mode-title-regexp "^\\(?:[0-9]+\\.\\)+\\(?:[0-9]+\\)? .*$"
   "Regular expression to model section titles in RFC documents.")
 
+(defvar rfc-mode--titles nil
+  "Buffer-local variable that keeps a list of section titles in this RFC.")
+(make-variable-buffer-local 'rfc-mode--titles)
+
+(defvar rfc-mode--last-title nil
+  "Last section title that the user visited.")
+
 ;;; Keys:
 
 (defvar rfc-mode-map
@@ -104,6 +111,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
     (define-key map (kbd "S-<tab>") 'backward-button)
     (define-key map (kbd "<prior>") 'rfc-mode-backward-page)
     (define-key map (kbd "<next>") 'rfc-mode-forward-page)
+    (define-key map (kbd "g") 'rfc-mode-goto-section)
     (define-key map (kbd "n") 'rfc-mode-next-section)
     (define-key map (kbd "p") 'rfc-mode-previous-section)
     map)
@@ -136,6 +144,32 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (forward-page)
   (rfc-mode-previous-header)
   (recenter 0))
+
+(defun rfc-mode-goto-section (section)
+  "Move point to SECTION."
+  (interactive
+   (let* ((default (if (member rfc-mode--last-title rfc-mode--titles)
+                       rfc-mode--last-title
+                     (car rfc-mode--titles)))
+          (completion-ignore-case t)
+          (prompt (concat "Go to section (default " default "): "))
+          (chosen (completing-read prompt rfc-mode--titles
+                                   nil nil nil nil default)))
+     (list chosen)))
+  (setq rfc-mode--last-title section)
+  (unless (rfc-mode--goto-section section)
+    (error "Section %s not found" section)))
+
+(defun rfc-mode--goto-section (section)
+  "Move point to SECTION if it exists, otherwise don't move point.
+Returns t if section is found, nil otherwise."
+  (let ((curpos (point))
+	(case-fold-search nil))
+    (goto-char (point-min))
+    (if (re-search-forward (concat "^" section) (point-max) t)
+	(progn (beginning-of-line) t)
+      (goto-char curpos)
+      nil)))
 
 (defun rfc-mode-next-section (n)
   "Move point to Nth next section (default 1)."
@@ -196,6 +230,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 
 (defun rfc-mode-highlight ()
   "Highlight the current buffer."
+  (setq rfc-mode--titles nil)
   (with-silent-modifications
     (let ((inhibit-read-only t))
       ;; Headers
@@ -217,7 +252,10 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
                 (end (match-end 0)))
             (put-text-property start end
                                'face 'rfc-mode-document-section-title-face)
+            (push (match-string 0) rfc-mode--titles)
             (goto-char end))))
+      ;; Keep titles in expected top to bottom order.
+      (setq rfc-mode--titles (nreverse rfc-mode--titles))
       ;; RFC references
       (save-excursion
         (goto-char (point-min))
