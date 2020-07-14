@@ -100,6 +100,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   (let ((map (make-keymap)))
     (set-keymap-parent map special-mode-map)
     (define-key map (kbd "q") 'rfc-mode-quit)
+    (define-key map (kbd "<tab>") 'forward-button)
+    (define-key map (kbd "S-<tab>") 'backward-button)
     (define-key map (kbd "<prior>") 'rfc-mode-backward-page)
     (define-key map (kbd "<next>") 'rfc-mode-forward-page)
     (define-key map (kbd "n") 'rfc-mode-next-section)
