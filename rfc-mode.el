@@ -166,7 +166,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
 (defun rfc-mode-read (number)
   "Read the RFC document NUMBER."
   (interactive "nRFC number: ")
-  (switch-to-buffer (rfc-mode--document-buffer number)))
+  (display-buffer (rfc-mode--document-buffer number)))
 
 (defun rfc-mode-reload-index ()
   "Reload the RFC document index from its original file."
@@ -373,11 +373,11 @@ The buffer is created if it does not exist."
   (let* ((buffer-name (rfc-mode--document-buffer-name number))
          (document-path (rfc-mode--document-path number)))
     (rfc-mode--fetch-document number document-path)
-    (find-file document-path)
-    (unless rfc-mode-use-original-buffer-names
-      (rename-buffer buffer-name))
-    (rfc-mode)
-    (current-buffer)))
+    (with-current-buffer (find-file-noselect document-path)
+      (unless rfc-mode-use-original-buffer-names
+        (rename-buffer buffer-name))
+      (rfc-mode)
+      (current-buffer))))
 
 ;;; Misc utils:
 
