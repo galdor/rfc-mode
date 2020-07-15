@@ -266,7 +266,8 @@ Returns t if section is found, nil otherwise."
             (make-text-button start end
                               'action `(lambda (button)
                                          (rfc-mode-read ,number))
-                              'help-echo (format "Read RFC %d" number))
+                              'help-echo (format "Read RFC %d" number)
+                              'follow-link t)
             (goto-char end)))))))
 
 (defun rfc-mode-header-start ()
