@@ -1,5 +1,24 @@
 #+TITLE: rfc-mode changelog
 
+* Next Version
+
+** Features
+- ~imenu~ integration. If you use a graphical user interface, the menu
+  bar will show a new menu, "RFC Contents", with links to the
+  different parts of an RFC document.
+- RFC links can now be navigated using the mouse, or by pressing
+  ~<Tab>~/~<S-Tab>~.
+- Pressing ~g~ in a ~rfc-mode~ buffer lets you navigate to an RFC
+  section by name.
+- You can navigate to previous and next RFC sections by pressing ~p~ and
+  ~n~, respectively.
+
+** Misc
+- Derive ~rfc-mode~ from ~special-mode~.
+- Make ~rfc-mode-read~ display the document in a separate window,
+  without switching buffers. This follows the typical Emacs convention
+  for displaying help buffers, like ~help-mode~ or ~man-mode~ follow.
+
 * 1.2.0
 This new release is driven by suggestions from Stefan Monnier and some issues
 which were open on Github. Thanks everyone!
