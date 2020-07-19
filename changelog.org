@@ -2,6 +2,10 @@
 
 * Next Version
 
+* 1.3.0
+This release improves navigation and introduce section detection, thanks to
+Daniel Martín.
+
 ** Features
 - ~imenu~ integration. If you use a graphical user interface, the menu
   bar will show a new menu, "RFC Contents", with links to the
