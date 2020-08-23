@@ -199,7 +199,10 @@ Returns t if section is found, nil otherwise."
 ;;;###autoload
 (defun rfc-mode-read (number)
   "Read the RFC document NUMBER."
-  (interactive "nRFC number: ")
+  (interactive
+   (if (and current-prefix-arg (not (consp current-prefix-arg)))
+       (list (prefix-numeric-value current-prefix-arg))
+     (list (read-number "RFC number: "))))
   (display-buffer (rfc-mode--document-buffer number)))
 
 (defun rfc-mode-reload-index ()
