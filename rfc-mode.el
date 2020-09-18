@@ -50,18 +50,15 @@
 
 (defface rfc-mode-browser-title-face
   '((t :inherit default))
-  "Face used to highlight the title of RFC documents in the RFC
-  browser.")
+  "Face used to highlight the title of RFC documents in the RFC browser.")
 
 (defface rfc-mode-browser-title-obsolete-face
   '((t :inherit font-lock-comment-face))
-  "Face used to highlight the title of obsolete RFC documents in
-  the RFC browser.")
+  "Face used to highlight the title of obsolete RFC documents in the RFC browser.")
 
 (defface rfc-mode-browser-status-face
   '((t :inherit font-lock-keyword-face))
-  "Face used to highlight RFC document statuses in the RFC'
-  browser.")
+  "Face used to highlight RFC document statuses in the RFC browser.")
 
 (defcustom rfc-mode-directory (expand-file-name "~/rfc/")
   "The directory where RFC documents are stored."
@@ -74,7 +71,8 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'string)
 
 (defcustom rfc-mode-use-original-buffer-names nil
-  "Whether RFC document buffers should have the name of the document file (e.g. rfc21.txt vs *rfc21*)."
+  "Whether RFC document buffers should have the name of the document file.
+If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
   :type 'boolean)
 
 (defcustom rfc-mode-browser-entry-title-width 60
