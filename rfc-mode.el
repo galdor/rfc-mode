@@ -264,11 +264,12 @@ Returns t if section is found, nil otherwise."
           (let ((start (match-beginning 0))
                 (end (match-end 0))
                 (number (string-to-number (match-string 1))))
-            (make-text-button start end
-                              'action `(lambda (button)
-                                         (rfc-mode-read ,number))
-                              'help-echo (format "Read RFC %d" number)
-                              'follow-link t)
+            (unless (= start (line-beginning-position))
+              (make-text-button start end
+                                'action `(lambda (button)
+                                           (rfc-mode-read ,number))
+                                'help-echo (format "Read RFC %d" number)
+                                'follow-link t))
             (goto-char end)))))))
 
 (defun rfc-mode-header-start ()
