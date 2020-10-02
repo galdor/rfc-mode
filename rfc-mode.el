@@ -209,6 +209,7 @@ Returns t if section is found, nil otherwise."
   (setq rfc-mode-index-entries
         (rfc-mode-read-index-file (rfc-mode-index-path))))
 
+;;;###autoload
 (defun rfc-mode-browse ()
   "Browse through all RFC documents referenced in the index using Helm."
   (interactive)
