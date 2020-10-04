@@ -196,11 +196,24 @@ Returns t if section is found, nil otherwise."
 
 ;;;###autoload
 (defun rfc-mode-read (number)
-  "Read the RFC document NUMBER."
+  "Read the RFC document NUMBER.
+Offer the number at point as default."
   (interactive
    (if (and current-prefix-arg (not (consp current-prefix-arg)))
        (list (prefix-numeric-value current-prefix-arg))
-     (list (read-number "RFC number: "))))
+     (let ((default
+             ;; Note that we don't use `number-at-point' as it will
+             ;; match number formats that make no sense as RFC numbers
+             ;; (floating point, hexadecimal, etc.).
+	     (save-excursion
+	       (skip-chars-backward "0-9")
+	       (if (looking-at "[0-9]")
+		   (string-to-number
+		    (buffer-substring-no-properties
+		     (point)
+		     (progn (skip-chars-forward "0-9")
+			    (point))))))))
+       (list (read-number "RFC number: " default)))))
   (display-buffer (rfc-mode--document-buffer number)))
 
 (defun rfc-mode-reload-index ()
