@@ -201,19 +201,7 @@ Offer the number at point as default."
   (interactive
    (if (and current-prefix-arg (not (consp current-prefix-arg)))
        (list (prefix-numeric-value current-prefix-arg))
-     (let ((default
-             ;; Note that we don't use `number-at-point' as it will
-             ;; match number formats that make no sense as RFC numbers
-             ;; (floating point, hexadecimal, etc.).
-	     (save-excursion
-	       (skip-chars-backward "0-9")
-	       (if (looking-at "[0-9]")
-		   (string-to-number
-		    (buffer-substring-no-properties
-		     (point)
-		     (progn (skip-chars-forward "0-9")
-			    (point))))))))
-       (list (read-number "RFC number: " default)))))
+     (list (read-number "RFC number: " (rfc-mode--integer-at-point)))))
   (display-buffer (rfc-mode--document-buffer number)))
 
 (defun rfc-mode-reload-index ()
@@ -435,6 +423,19 @@ The buffer is created if it does not exist."
       (current-buffer))))
 
 ;;; Misc utils:
+
+(defun rfc-mode--integer-at-point ()
+  ;; Note that we don't use `number-at-point' as it will match
+  ;; number formats that make no sense as RFC numbers (floating
+  ;; point, hexadecimal, etc.).
+  (save-excursion
+    (skip-chars-backward "0-9")
+    (and (looking-at "[0-9]")
+	 (string-to-number
+	  (buffer-substring-no-properties
+	   (point)
+	   (progn (skip-chars-forward "0-9")
+		  (point)))))))
 
 (defun rfc-mode--fetch-document (suffix document-path)
   "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
