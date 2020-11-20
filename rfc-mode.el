@@ -3,7 +3,7 @@
 ;; Author: Nicolas Martyanoff <khaelin@gmail.com>
 ;; URL: https://github.com/galdor/rfc-mode
 ;; Version: 1.3.0
-;; Package-Requires: ((emacs "25.1") (helm "3.2"))
+;; Package-Requires: ((emacs "25.1"))
 
 ;; Copyright 2019 Nicolas Martyanoff <khaelin@gmail.com>
 ;;
@@ -26,7 +26,11 @@
 ;;; Code:
 
 (require 'helm nil t)
+(require 'pcase)
 (require 'seq)
+
+(declare-function helm-build-sync-source "helm-source")
+(declare-function helm-make-actions "helm-lib")
 
 ;;; Configuration:
 
@@ -69,6 +73,23 @@
   "A `format'able URL for fetching arbitrary RFC documents.
 Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'string)
+
+(defcustom rfc-mode-browse-input-function
+  (if (require 'helm nil t) 'helm 'completing-read)
+  "Function used by `rfc-mode-browse' to read user input.
+
+Only `read-number', `completing-read' and `helm' are explicitly
+supported.  Any other function is called with no arguments and
+must return an integer.
+
+Here `completion-read' works best if you use some completion
+mode that displays candidates \"vertically\" like `helm' does.
+`ivy-mode' is a popular choice.  `fido-mode' in combination
+with `icomplete-vertical-mode' should also work well."
+  :type '(choice (const read-number)
+		 (const completing-read)
+		 (const helm)
+		 function))
 
 (defcustom rfc-mode-use-original-buffer-names nil
   "Whether RFC document buffers should have the name of the document file.
@@ -212,14 +233,43 @@ Offer the number at point as default."
 
 ;;;###autoload
 (defun rfc-mode-browse ()
-  "Browse through all RFC documents referenced in the index using Helm."
+  "Browse through all RFC documents referenced in the index."
   (interactive)
   (rfc-mode--fetch-document "-index" (rfc-mode-index-path))
   (unless rfc-mode-index-entries
     (setq rfc-mode-index-entries
           (rfc-mode-read-index-file (rfc-mode-index-path))))
-  (helm :buffer "*helm rfc browser*"
-        :sources (rfc-mode-browser-helm-sources rfc-mode-index-entries)))
+  (pcase rfc-mode-browse-input-function
+    ('read-number
+     (display-buffer (rfc-mode--document-buffer
+		      (read-number "View RFC document: "
+				   (rfc-mode--integer-at-point)))))
+    ('helm
+     (if (and (require 'helm nil t)
+	      (fboundp 'helm))
+	 (helm :buffer "*helm rfc browser*"
+	       :sources (rfc-mode-browser-helm-sources
+			 rfc-mode-index-entries))
+       (user-error "Helm has to be installed explicitly")))
+    ('completing-read
+     (let* ((default (rfc-mode--integer-at-point))
+	    (choice (completing-read
+		     "View RFC document: "
+		     (mapcar #'rfc-mode-browser-format-candidate
+			     rfc-mode-index-entries)
+		     nil nil nil nil
+		     (and default
+			  (rfc-mode-browser-format-candidate default))))
+	    (number (or (and (string-match "\\`RFC\\([0-9]+\\)" choice)
+			     (string-to-number (match-string 1 choice)))
+			(ignore-errors (string-to-number choice)))))
+       (unless number
+	 (user-error
+	  "%s doesn't match a complication candidate and is not a number"
+	  choice))
+       (display-buffer (rfc-mode--document-buffer number))))
+    (_ (display-buffer (rfc-mode--document-buffer
+			(funcall rfc-mode-browse-input-function))))))
 
 ;;;###autoload
 (define-derived-mode rfc-mode special-mode "rfc-mode"
@@ -313,11 +363,11 @@ no next header is found."
 
 ENTRIES is a list of RFC index entries in the browser."
   (helm-build-sync-source "RFC documents"
-    :candidates (mapcar #'rfc-mode-browser-helm-candidate entries)
+    :candidates (mapcar #'rfc-mode-browser-format-candidate entries)
     :action (helm-make-actions
              "Read" #'rfc-mode-browser-helm-entry-read)))
 
-(defun rfc-mode-browser-helm-candidate (entry)
+(defun rfc-mode-browser-format-candidate (entry)
   "Create a Helm candidate for ENTRY.
 
 ENTRY is a RFC index entry in the browser."
