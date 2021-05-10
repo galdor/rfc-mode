@@ -29,6 +29,9 @@
 (require 'pcase)
 (require 'seq)
 
+(eval-when-compile
+  (require 'cl-lib))
+
 (declare-function helm-build-sync-source "helm-source")
 (declare-function helm-make-actions "helm-lib")
 
