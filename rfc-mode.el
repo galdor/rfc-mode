@@ -240,8 +240,7 @@ Offer the number at point as default."
   (interactive)
   (rfc-mode--fetch-document "-index" (rfc-mode-index-path))
   (unless rfc-mode-index-entries
-    (setq rfc-mode-index-entries
-          (rfc-mode-read-index-file (rfc-mode-index-path))))
+    (rfc-mode-reload-index))
   (pcase rfc-mode-browse-input-function
     ('read-number
      (display-buffer (rfc-mode--document-buffer
@@ -256,19 +255,22 @@ Offer the number at point as default."
        (user-error "Helm has to be installed explicitly")))
     ('completing-read
      (let* ((default (rfc-mode--integer-at-point))
-	    (choice (completing-read
-		     "View RFC document: "
-		     (mapcar #'rfc-mode-browser-format-candidate
-			     rfc-mode-index-entries)
-		     nil nil nil nil
-		     (and default
-			  (rfc-mode-browser-format-candidate default))))
+            (cands (mapcar (lambda (entry)
+                             (let ((cand
+                                    (rfc-mode-browser-format-candidate entry)))
+                               (and (numberp default)
+                                    (= (plist-get entry :number) default)
+                                    (setq default (car cand)))
+                               cand))
+                           rfc-mode-index-entries))
+            (choice (completing-read "View RFC document: "
+                                     cands nil nil nil nil default))
 	    (number (or (and (string-match "\\`RFC\\([0-9]+\\)" choice)
 			     (string-to-number (match-string 1 choice)))
 			(ignore-errors (string-to-number choice)))))
        (unless number
 	 (user-error
-	  "%s doesn't match a complication candidate and is not a number"
+          "%s doesn't match a completion candidate and is not a number"
 	  choice))
        (display-buffer (rfc-mode--document-buffer number))))
     (_ (display-buffer (rfc-mode--document-buffer
