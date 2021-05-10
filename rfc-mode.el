@@ -321,8 +321,8 @@ Offer the number at point as default."
                 (number (string-to-number (match-string 1))))
             (unless (= start (line-beginning-position))
               (make-text-button start end
-                                'action `(lambda (button)
-                                           (rfc-mode-read ,number))
+                                'action (lambda (_button)
+                                          (rfc-mode-read number))
                                 'help-echo (format "Read RFC %d" number)
                                 'follow-link t))
             (goto-char end)))))))
