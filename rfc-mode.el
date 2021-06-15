@@ -90,9 +90,9 @@ mode that displays candidates \"vertically\" like `helm' does.
 `ivy-mode' is a popular choice.  `fido-mode' in combination
 with `icomplete-vertical-mode' should also work well."
   :type '(choice (const read-number)
-		 (const completing-read)
-		 (const helm)
-		 function))
+                 (const completing-read)
+                 (const helm)
+                 function))
 
 (defcustom rfc-mode-use-original-buffer-names nil
   "Whether RFC document buffers should have the name of the document file.
@@ -186,10 +186,10 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
   "Move point to SECTION if it exists, otherwise don't move point.
 Returns t if section is found, nil otherwise."
   (let ((curpos (point))
-	(case-fold-search nil))
+        (case-fold-search nil))
     (goto-char (point-min))
     (if (re-search-forward (concat "^" section) (point-max) t)
-	(progn (beginning-of-line) t)
+        (progn (beginning-of-line) t)
       (goto-char curpos)
       nil)))
 
@@ -199,9 +199,9 @@ Returns t if section is found, nil otherwise."
   (let ((case-fold-search nil)
         (start (point)))
     (if (looking-at rfc-mode-title-regexp)
-	(forward-line 1))
+        (forward-line 1))
     (if (re-search-forward rfc-mode-title-regexp (point-max) t n)
-	(beginning-of-line)
+        (beginning-of-line)
       (goto-char (point-max))
       ;; The last line doesn't belong to any section.
       (forward-line -1))
@@ -213,9 +213,9 @@ Returns t if section is found, nil otherwise."
   (interactive "p")
   (let ((case-fold-search nil))
     (if (looking-at rfc-mode-title-regexp)
-	(forward-line -1))
+        (forward-line -1))
     (if (re-search-backward rfc-mode-title-regexp (point-min) t n)
-	(beginning-of-line)
+        (beginning-of-line)
       (goto-char (point-min)))))
 
 ;;;###autoload
@@ -244,14 +244,14 @@ Offer the number at point as default."
   (pcase rfc-mode-browse-input-function
     ('read-number
      (display-buffer (rfc-mode--document-buffer
-		      (read-number "View RFC document: "
-				   (rfc-mode--integer-at-point)))))
+                      (read-number "View RFC document: "
+                                   (rfc-mode--integer-at-point)))))
     ('helm
      (if (and (require 'helm nil t)
-	      (fboundp 'helm))
-	 (helm :buffer "*helm rfc browser*"
-	       :sources (rfc-mode-browser-helm-sources
-			 rfc-mode-index-entries))
+              (fboundp 'helm))
+         (helm :buffer "*helm rfc browser*"
+               :sources (rfc-mode-browser-helm-sources
+                         rfc-mode-index-entries))
        (user-error "Helm has to be installed explicitly")))
     ('completing-read
      (let* ((default (rfc-mode--integer-at-point))
@@ -265,16 +265,16 @@ Offer the number at point as default."
                            rfc-mode-index-entries))
             (choice (completing-read "View RFC document: "
                                      cands nil nil nil nil default))
-	    (number (or (and (string-match "\\`RFC\\([0-9]+\\)" choice)
-			     (string-to-number (match-string 1 choice)))
-			(ignore-errors (string-to-number choice)))))
+            (number (or (and (string-match "\\`RFC\\([0-9]+\\)" choice)
+                             (string-to-number (match-string 1 choice)))
+                        (ignore-errors (string-to-number choice)))))
        (unless number
-	 (user-error
+         (user-error
           "%s doesn't match a completion candidate and is not a number"
-	  choice))
+          choice))
        (display-buffer (rfc-mode--document-buffer number))))
     (_ (display-buffer (rfc-mode--document-buffer
-			(funcall rfc-mode-browse-input-function))))))
+                        (funcall rfc-mode-browse-input-function))))))
 
 ;;;###autoload
 (define-derived-mode rfc-mode special-mode "rfc-mode"
@@ -486,11 +486,11 @@ The buffer is created if it does not exist."
   (save-excursion
     (skip-chars-backward "0-9")
     (and (looking-at "[0-9]")
-	 (string-to-number
-	  (buffer-substring-no-properties
-	   (point)
-	   (progn (skip-chars-forward "0-9")
-		  (point)))))))
+         (string-to-number
+          (buffer-substring-no-properties
+           (point)
+           (progn (skip-chars-forward "0-9")
+                  (point)))))))
 
 (defun rfc-mode--fetch-document (suffix document-path)
   "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
@@ -531,4 +531,7 @@ For example: \"RFC3401, RFC3402 ,RFC 3403\"."
 
 (provide 'rfc-mode)
 
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; rfc-mode.el ends here
