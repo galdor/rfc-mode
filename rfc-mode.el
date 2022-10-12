@@ -23,14 +23,20 @@
 
 ;; This package makes it easy to browse and read RFC documents.
 
+;; It offers a Helm-based browser of the list of RFCs as well as
+;; some highlighting of hyperlinks when reading the actual RFCs.
+;; If you want to browse the list without Helm, you might prefer
+;; [rfcview](http://github.com/zeph1e/rfcview.el).
+
+;; Todo:
+;; - Use font-lock
+;; - Add hyperlinks from the `Table of Contents'
+
 ;;; Code:
 
 (require 'helm nil t)
-(require 'pcase)
 (require 'seq)
 
-(eval-when-compile
-  (require 'cl-lib))
 
 (declare-function helm-build-sync-source "helm-source")
 (declare-function helm-make-actions "helm-lib")
@@ -78,7 +84,7 @@ Assume RFC documents are named as e.g. rfc21.txt, rfc-index.txt."
   :type 'string)
 
 (defcustom rfc-mode-browse-input-function
-  (if (require 'helm nil t) 'helm 'completing-read)
+  (if (featurep 'helm) 'helm 'completing-read)
   "Function used by `rfc-mode-browse' to read user input.
 
 Only `read-number', `completing-read' and `helm' are explicitly
@@ -105,8 +111,7 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
 
 (defcustom rfc-mode-imenu-title "RFC Contents"
   "The title to use if `rfc-mode' adds a RFC Contents menu to the menubar."
-  :type 'string
-  :group 'rfc-mode-group)
+  :type 'string)
 
 ;;; Misc variables:
 
@@ -116,9 +121,8 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
 (defconst rfc-mode-title-regexp "^\\(?:[0-9]+\\.\\)+\\(?:[0-9]+\\)? .*$"
   "Regular expression to model section titles in RFC documents.")
 
-(defvar rfc-mode--titles nil
+(defvar-local rfc-mode--titles nil
   "Buffer-local variable that keeps a list of section titles in this RFC.")
-(make-variable-buffer-local 'rfc-mode--titles)
 
 (defvar rfc-mode--last-title nil
   "Last section title that the user visited.")
@@ -128,14 +132,13 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
 (defvar rfc-mode-map
   (let ((map (make-keymap)))
     (set-keymap-parent map special-mode-map)
-    (define-key map (kbd "q") 'rfc-mode-quit)
-    (define-key map (kbd "<tab>") 'forward-button)
-    (define-key map (kbd "<backtab>") 'backward-button)
-    (define-key map (kbd "<prior>") 'rfc-mode-backward-page)
-    (define-key map (kbd "<next>") 'rfc-mode-forward-page)
-    (define-key map (kbd "g") 'rfc-mode-goto-section)
-    (define-key map (kbd "n") 'rfc-mode-next-section)
-    (define-key map (kbd "p") 'rfc-mode-previous-section)
+    (define-key map (kbd "<tab>")     #'forward-button)
+    (define-key map (kbd "<backtab>") #'backward-button)
+    (define-key map (kbd "<prior>")   #'rfc-mode-backward-page)
+    (define-key map (kbd "<next>")    #'rfc-mode-forward-page)
+    (define-key map (kbd "g")         #'rfc-mode-goto-section)
+    (define-key map (kbd "n")         #'rfc-mode-next-section)
+    (define-key map (kbd "p")         #'rfc-mode-previous-section)
     map)
   "The keymap for `rfc-mode'.")
 
@@ -148,10 +151,7 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
   (setq imenu-generic-expression (list (list nil rfc-mode-title-regexp 0)))
   (imenu-add-to-menubar rfc-mode-imenu-title))
 
-(defun rfc-mode-quit ()
-  "Quit the current window and bury its buffer."
-  (interactive)
-  (quit-window))
+(define-obsolete-function-alias 'rfc-mode-quit #'quit-window "rfc-mode-1.4")
 
 (defun rfc-mode-backward-page ()
   "Scroll to the previous page of the current buffer."
@@ -167,7 +167,7 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
   (rfc-mode-previous-header)
   (recenter 0))
 
-(defun rfc-mode-goto-section (section)
+(defun rfc-mode-goto-section (section)  ;FIXME: Why not use imenu for that?
   "Move point to SECTION."
   (interactive
    (let* ((default (if (member rfc-mode--last-title rfc-mode--titles)
@@ -231,27 +231,28 @@ Offer the number at point as default."
 (defun rfc-mode-reload-index ()
   "Reload the RFC document index from its original file."
   (interactive)
-  (setq rfc-mode-index-entries
-        (rfc-mode-read-index-file (rfc-mode-index-path))))
+  (setq rfc-mode-index-entries nil))
+
+(defun rfc-mode--index-entries ()
+  (or rfc-mode-index-entries
+      (let ((file (rfc-mode--document-file "-index")))
+        (setq rfc-mode-index-entries
+              (rfc-mode-read-index-file file)))))
 
 ;;;###autoload
 (defun rfc-mode-browse ()
   "Browse through all RFC documents referenced in the index."
   (interactive)
-  (rfc-mode--fetch-document "-index" (rfc-mode-index-path))
-  (unless rfc-mode-index-entries
-    (rfc-mode-reload-index))
   (pcase rfc-mode-browse-input-function
     ('read-number
      (display-buffer (rfc-mode--document-buffer
                       (read-number "View RFC document: "
                                    (rfc-mode--integer-at-point)))))
     ('helm
-     (if (and (require 'helm nil t)
-              (fboundp 'helm))
-         (helm :buffer "*helm rfc browser*"
-               :sources (rfc-mode-browser-helm-sources
-                         rfc-mode-index-entries))
+     (if (fboundp 'helm)
+	 (helm :buffer "*helm rfc browser*"
+	       :sources (rfc-mode-browser-helm-sources
+			 (rfc-mode--index-entries)))
        (user-error "Helm has to be installed explicitly")))
     ('completing-read
      (let* ((default (rfc-mode--integer-at-point))
@@ -262,7 +263,7 @@ Offer the number at point as default."
                                     (= (plist-get entry :number) default)
                                     (setq default (car cand)))
                                cand))
-                           rfc-mode-index-entries))
+                           (rfc-mode--index-entries)))
             (choice (completing-read "View RFC document: "
                                      cands nil nil nil nil default))
             (number (or (and (string-match "\\`RFC\\([0-9]+\\)" choice)
@@ -289,19 +290,20 @@ Offer the number at point as default."
 (defun rfc-mode-highlight ()
   "Highlight the current buffer."
   (setq rfc-mode--titles nil)
+  ;; FIXME: Use font-lock!
   (with-silent-modifications
     (let ((inhibit-read-only t))
       ;; Headers
       (save-excursion
         (goto-char (point-min))
-        (cl-loop
-         (let* ((end (rfc-mode-next-header))
-                (start (point)))
-           (unless end
-             (cl-return))
-           (put-text-property start end
-                              'face 'rfc-mode-document-header-face)
-           (goto-char end))))
+        (while
+            (let* ((end (rfc-mode-next-header))
+                   (start (point)))
+              (when end
+                (put-text-property start end
+                                   'face 'rfc-mode-document-header-face)
+                (goto-char end)
+                'continue))))
       ;; Section titles
       (save-excursion
         (goto-char (point-min))
@@ -402,14 +404,10 @@ ENTRY is a RFC index entry in the browser."
 
 ;;; Index utils:
 
-(defun rfc-mode-index-path ()
-  "Return he path of the file containing the index of all RFC documents."
-  (concat rfc-mode-directory "rfc-index.txt"))
-
-(defun rfc-mode-read-index-file (path)
-  "Read an RFC index file at PATH and return a list of entries."
+(defun rfc-mode-read-index-file (filename)
+  "Read an RFC index file at FILENAME and return a list of entries."
   (with-temp-buffer
-    (insert-file-contents path)
+    (insert-file-contents filename)
     (rfc-mode-read-index (current-buffer))))
 
 (defun rfc-mode-read-index (buffer)
@@ -460,17 +458,21 @@ ENTRY is a RFC index entry in the browser."
   "Return the buffer name for the RFC document NUMBER."
   (concat "*rfc" (number-to-string number) "*"))
 
-(defun rfc-mode--document-path (number)
-  "Return the absolute path of the RFC document NUMBER."
-  (expand-file-name (format "rfc%s.txt" number) rfc-mode-directory))
+(defun rfc-mode--document-file (number)
+  "Return the absolute file name of the RFC document NUMBER."
+  (let ((file
+         (expand-file-name (format "rfc%s.txt" number) rfc-mode-directory)))
+    (rfc-mode--ensure-directory-exists)
+    (unless (file-exists-p file)
+      (url-copy-file (format rfc-mode-document-url number) file))
+    file))
 
 (defun rfc-mode--document-buffer (number)
   "Return a buffer visiting the RFC document NUMBER.
 
 The buffer is created if it does not exist."
   (let* ((buffer-name (rfc-mode--document-buffer-name number))
-         (document-path (rfc-mode--document-path number)))
-    (rfc-mode--fetch-document number document-path)
+         (document-path (rfc-mode--document-file number)))
     (with-current-buffer (find-file-noselect document-path)
       (unless rfc-mode-use-original-buffer-names
         (rename-buffer buffer-name))
@@ -491,13 +493,6 @@ The buffer is created if it does not exist."
            (point)
            (progn (skip-chars-forward "0-9")
                   (point)))))))
-
-(defun rfc-mode--fetch-document (suffix document-path)
-  "Ensure an RFC document with SUFFIX exists at DOCUMENT-PATH.
-If no such file exists, fetch it from `rfc-document-url'."
-  (rfc-mode--ensure-directory-exists)
-  (unless (file-exists-p document-path)
-    (url-copy-file (format rfc-mode-document-url suffix) document-path)))
 
 (defun rfc-mode--ensure-directory-exists ()
   "Check that `rfc-mode-directory' exists, creating it if it does not."
