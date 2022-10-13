@@ -41,4 +41,4 @@ enter the reference of the RFC document yourself.
 ![Reader](img/reader.png)
 
 ## Contact
-If you have an idea or a question, email me at <khaelin@gmail.com>.
+If you have an idea or a question, email me at <nicolas@n16f.net>.

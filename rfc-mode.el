@@ -1,11 +1,11 @@
 ;;; rfc-mode.el --- RFC document browser and viewer -*- lexical-binding: t -*-
 
-;; Author: Nicolas Martyanoff <khaelin@gmail.com>
+;; Author: Nicolas Martyanoff <nicolas@n16f.net>
 ;; URL: https://github.com/galdor/rfc-mode
 ;; Version: 1.3.0
 ;; Package-Requires: ((emacs "25.1"))
 
-;; Copyright 2019 Nicolas Martyanoff <khaelin@gmail.com>
+;; Copyright 2019-2022 Nicolas Martyanoff <nicolas@n16f.net>
 ;;
 ;; Permission to use, copy, modify, and/or distribute this software for any
 ;; purpose with or without fee is hereby granted, provided that the above
