@@ -35,7 +35,7 @@ enter the reference of the RFC document yourself.
 
 ## Screenshots
 ### Browser
-![Helm-based browser](img/helm-browser.png)
+![Helm-based browser](img/browser.png)
 
 ### Reader
 ![Reader](img/reader.png)
