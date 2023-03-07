@@ -445,7 +445,7 @@ ENTRY is a RFC index entry in the browser."
   (let* ((number-string (match-string 1 string))
          (number (string-to-number number-string))
          (title (match-string 2 string)))
-    (when (zerop member)
+    (when (zerop number)
       (error "Invalid index entry number: %S" number-string))
     (let ((entry (list :number number :title title)))
       (when (string-match "(Status: \\([^)]+\\))" string)
