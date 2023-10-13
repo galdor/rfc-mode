@@ -3,6 +3,12 @@
 * Next Version
 /Work in progress./
 
+* 1.4.1
+** Bugs
+- Fix page-based navigation (thanks to Matthew Woodcraft for reporting the
+  issue) on Emacs 29.
+- Fix major-mode auto-detection for rfc-mode buffers.
+
 * 1.4.0
 I should have released minor versions for bug fixes, but it seems everyone is
 using the =master= branch from MELPA, and so am I. So major only it is. I will
