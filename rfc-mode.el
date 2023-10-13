@@ -40,6 +40,10 @@
   '((t :inherit font-lock-comment-face))
   "Face used for RFC document page headers.")
 
+(defface rfc-mode-document-footer-face
+  '((t :inherit font-lock-comment-face))
+  "Face used for RFC document page footers.")
+
 (defface rfc-mode-document-section-title-face
   '((t :inherit font-lock-keyword-face))
   "Face used for RFC document section titles.")
@@ -297,17 +301,24 @@ Offer the number at point as default."
   ;; FIXME: Use font-lock!
   (with-silent-modifications
     (let ((inhibit-read-only t))
-      ;; Headers
+      ;; Headers and footers
       (save-excursion
         (goto-char (point-min))
-        (while
-            (let* ((end (rfc-mode-next-header))
-                   (start (point)))
-              (when end
-                (put-text-property start end
-                                   'face 'rfc-mode-document-header-face)
-                (goto-char end)
-                'continue))))
+        (while (search-forward "" nil t)
+          (beginning-of-line)
+          (let ((form-feed (point)))
+            (let* ((footer-end (rfc-mode-previous-footer-start))
+                   (footer-start (point)))
+              (put-text-property
+               footer-start footer-end
+               'face 'rfc-mode-document-footer-face))
+            (goto-char form-feed)
+            (let* ((header-end (rfc-mode-header-start))
+                   (header-start (point)))
+              (put-text-property
+               header-start header-end
+               'face 'rfc-mode-document-header-face)
+              (goto-char header-end)))))
       ;; Section titles
       (save-excursion
         (goto-char (point-min))
@@ -347,14 +358,17 @@ the header."
     (prog1 (point)
       (move-beginning-of-line 1))))
 
-(defun rfc-mode-next-header ()
-  "Move the end of the next header.
+(defun rfc-mode-previous-footer-start ()
+  "Move to the start of the previous footer.
 
-Return the position of the end of the next header or NIL if
-no next header is found."
-  (when (search-forward "" nil t)
-    (goto-char (match-beginning 0))
-    (rfc-mode-header-start)))
+When the point is on a form feed character, move it to the start
+of the previous page footer and return the position of the end of
+the footer."
+  (when (looking-at "")
+    (forward-line -1)
+    (move-end-of-line 1)
+    (prog1 (point)
+      (move-beginning-of-line 1))))
 
 ;;; Browser utils:
 

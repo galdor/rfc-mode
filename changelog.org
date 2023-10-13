@@ -3,6 +3,9 @@
 * Next Version
 /Work in progress./
 
+** Bugs
+- Fix footer highlighting.
+
 * 1.4.1
 ** Bugs
 - Fix page-based navigation (thanks to Matthew Woodcraft for reporting the
