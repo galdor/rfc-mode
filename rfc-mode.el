@@ -346,7 +346,7 @@ Offer the number at point as default."
 (defun rfc-mode-header-start ()
   "Move to the start of the current header.
 
-When the point is on a linebreak character, move it to the start
+When the point is on a form feed character, move it to the start
 of the current page header and return the position of the end of
 the header."
   (when (looking-at "")
@@ -367,7 +367,7 @@ no previous header is found."
     (rfc-mode-header-start)))
 
 (defun rfc-mode-next-header ()
-  "Move the end of the previous header.
+  "Move the end of the next header.
 
 Return the position of the end of the next header or NIL if
 no next header is found."
