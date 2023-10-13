@@ -155,21 +155,25 @@ If nil (the default) then use e.g. *rfc21*, otherwise use e.g. rfc21.txt."
 
 (defun rfc-mode-recenter ()
   "Do the same as `recenter-top-bottom' would for the `top' position."
+  (rfc-mode-header-start)
   (let ((recenter-positions '(top)))
     (recenter-top-bottom)))
 
 (defun rfc-mode-backward-page ()
   "Scroll to the previous page of the current buffer."
   (interactive)
+  (beginning-of-line)
+  (unless (looking-at "")
+    (backward-page))
   (backward-page)
-  (rfc-mode-previous-header)
+  (beginning-of-line 1)
   (rfc-mode-recenter))
 
 (defun rfc-mode-forward-page ()
   "Scroll to the next page of the current buffer."
   (interactive)
   (forward-page)
-  (rfc-mode-previous-header)
+  (beginning-of-line 1)
   (rfc-mode-recenter))
 
 (defun rfc-mode-goto-section (section)  ;FIXME: Why not use imenu for that?
@@ -352,19 +356,8 @@ the header."
   (when (looking-at "")
     (forward-line 1)
     (move-end-of-line 1)
-    (let ((end (point)))
-      (forward-line -2)
-      (move-beginning-of-line 1)
-      end)))
-
-(defun rfc-mode-previous-header ()
-  "Move the the start of the previous header.
-
-Return the position of the end of the previous header or NIL if
-no previous header is found."
-  (when (search-backward "" nil t)
-    (goto-char (match-beginning 0))
-    (rfc-mode-header-start)))
+    (prog1 (point)
+      (move-beginning-of-line 1))))
 
 (defun rfc-mode-next-header ()
   "Move the end of the next header.
