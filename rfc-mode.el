@@ -528,10 +528,6 @@ For example: \"RFC3401, RFC3402 ,RFC 3403\"."
   (put-text-property 0 (length string) 'face face string)
   string)
 
-
 (provide 'rfc-mode)
 
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:
 ;;; rfc-mode.el ends here
