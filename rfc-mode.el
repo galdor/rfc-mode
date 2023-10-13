@@ -5,7 +5,7 @@
 ;; Version: 1.4.0
 ;; Package-Requires: ((emacs "25.1"))
 
-;; Copyright 2019-2022 Nicolas Martyanoff <nicolas@n16f.net>
+;; Copyright 2019-2023 Nicolas Martyanoff <nicolas@n16f.net>
 ;;
 ;; Permission to use, copy, modify, and/or distribute this software for any
 ;; purpose with or without fee is hereby granted, provided that the above
