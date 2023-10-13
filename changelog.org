@@ -3,6 +3,7 @@
 * Next Version
 /Work in progress./
 
+* 1.4.2
 ** Bugs
 - Fix footer highlighting.
 

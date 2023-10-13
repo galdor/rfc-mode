@@ -3,7 +3,7 @@
 ;; Author: Nicolas Martyanoff <nicolas@n16f.net>
 ;; SPDX-License-Identifier: ISC
 ;; URL: https://github.com/galdor/rfc-mode
-;; Version: 1.4.1
+;; Version: 1.4.2
 ;; Package-Requires: ((emacs "25.1"))
 
 ;;; Commentary:
