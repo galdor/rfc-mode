@@ -300,6 +300,7 @@ Offer the number at point as default."
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("/rfc[0-9]+\\.txt\\'" . rfc-mode))
+(add-to-list 'auto-mode-alist '("\\*rfc[0-9]+\\*\\'" . rfc-mode))
 
 ;;; Syntax utils:
 
