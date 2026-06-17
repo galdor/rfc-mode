@@ -443,7 +443,7 @@ ENTRY is a RFC index entry in the browser."
     (let ((entries nil))
       (while (search-forward-regexp "^[0-9]+ " nil t)
         (let ((start (match-beginning 0)))
-          (search-forward-regexp " $")
+          (search-forward-regexp " $\\|^$")
           (let* ((end (match-beginning 0))
                  (lines (buffer-substring start end))
                  (entry-string (replace-regexp-in-string "[ \n]+" " " lines))
