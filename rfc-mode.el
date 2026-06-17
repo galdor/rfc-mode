@@ -396,7 +396,7 @@ ENTRIES is a list of RFC index entries in the browser."
 
 ENTRY is a RFC index entry in the browser."
   (let* ((ref (rfc-mode--pad-string
-               (format "RFC%d" (plist-get entry :number)) 7))
+               (format "RFC%d" (plist-get entry :number)) 8))
          (title (rfc-mode--pad-string
                  (plist-get entry :title)
                  rfc-mode-browser-entry-title-width))
